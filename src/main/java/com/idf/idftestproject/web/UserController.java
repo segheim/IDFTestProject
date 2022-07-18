@@ -24,5 +24,4 @@ public class UserController {
     public User registration(@RequestBody UserRequest userRequest) {
         return (User) service.createUser(userRequest);
     }
-
 }
