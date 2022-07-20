@@ -30,7 +30,9 @@ public class CoinLoreRepositoryInfoImpl implements CoinLoreRepository {
             final String ids = idList.stream()
                     .map(i -> i.toString())
                     .collect(Collectors.joining(DELIMITER));
-            final Cryptocurrency[] currencies = restTemplate.getForObject(BASIC_URL.concat(ids), Cryptocurrency[].class);
+            final String concat = BASIC_URL.concat(ids);
+            logger.info("IDIDIDIDIDIIDI" + concat);
+            final Cryptocurrency[] currencies = restTemplate.getForObject(concat, Cryptocurrency[].class);
             logger.info("!!!!!!!!!!!!!" + Arrays.toString(currencies));
             return Arrays.asList(currencies);
         }

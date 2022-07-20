@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class CryptocurrencyRepositoryImpl extends AbstractRepository<Cryptocurrency> implements CryptocurrencyRepository {

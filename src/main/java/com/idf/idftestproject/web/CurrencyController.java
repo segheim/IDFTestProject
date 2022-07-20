@@ -24,12 +24,6 @@ public class CurrencyController {
 
     @Autowired
     private CryptocurrencyService cryptocurrencyService;
-    @Autowired
-    private List<CryptocurrencyCode> availableCryptocurrency;
-
-    @Autowired
-    private CryptocurrencyRepository cryptocurrencyRepository;
-
 
     @GetMapping
     public List<String> readAll() throws ControllerException {
@@ -39,10 +33,6 @@ public class CurrencyController {
             logger.warn(message);
             throw new ControllerException(message);
         }
-
-//        cryptocurrencyRepository.createCryptocurrency(new Cryptocurrency(1l, "ETH", new BigDecimal(BigInteger.TEN)));
-//        cryptocurrencyService.retrieveCryptocurrencyPrice();
-
         return cryptocurrencyService.findAll();
     }
 

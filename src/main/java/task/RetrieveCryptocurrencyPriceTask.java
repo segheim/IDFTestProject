@@ -30,9 +30,7 @@ public class RetrieveCryptocurrencyPriceTask extends Thread {
     @Override
     public void run() {
         try {
-            long count = 0l;
             while (true) {
-                logger.info("COUNTCOUNTCOUNTCOUNTCOUNTCOUNTCOUNTCOUNTCOUNT   " + count++);
                 final List<Cryptocurrency> cryptocurrencies = cryptocurrencyService.retrieveCryptocurrencyPrice();
                 final List<User> users = userService.readAll();
                 final Map<User, BigDecimal> usersWithChangePrices = cryptocurrencyService.calculateChangingCryptocurrency(cryptocurrencies, users);
@@ -40,7 +38,6 @@ public class RetrieveCryptocurrencyPriceTask extends Thread {
                     logger.warn("Changes! " + entry.getKey().getName() + " " + entry.getKey().getSymbol() + " " +
                             entry.getValue().toString());
                 }
-                logger.info("BEFORE SLEEEEEEEEEEP");
                 Thread.sleep(SURVEY_PERIOD);
             }
         } catch (InterruptedException e) {

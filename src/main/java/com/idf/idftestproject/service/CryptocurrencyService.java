@@ -2,7 +2,6 @@ package com.idf.idftestproject.service;
 
 import com.idf.idftestproject.model.Cryptocurrency;
 import com.idf.idftestproject.model.User;
-import netscape.javascript.JSObject;
 
 import java.math.BigDecimal;
 import java.util.List;

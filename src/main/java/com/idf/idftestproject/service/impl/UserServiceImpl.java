@@ -1,6 +1,5 @@
 package com.idf.idftestproject.service.impl;
 
-import com.idf.idftestproject.exception.ServiceException;
 import com.idf.idftestproject.model.Cryptocurrency;
 import com.idf.idftestproject.model.User;
 import com.idf.idftestproject.model.UserRequest;
@@ -16,14 +15,10 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final CryptocurrencyRepository cryptocurrencyRepository;
-    private final UserRepository userRepository;
-
     @Autowired
-    public UserServiceImpl(CryptocurrencyRepository cryptocurrencyRepository, UserRepository userRepository) {
-        this.cryptocurrencyRepository = cryptocurrencyRepository;
-        this.userRepository = userRepository;
-    }
+    private CryptocurrencyRepository cryptocurrencyRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<User> readAll() {
