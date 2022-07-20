@@ -1,8 +1,13 @@
 package com.idf.idftestproject.service;
 
+import com.idf.idftestproject.model.User;
 import com.idf.idftestproject.model.UserRequest;
 
-public interface UserService<T> {
+import java.util.List;
 
-    T createUser(UserRequest userRequest);
+public interface UserService {
+
+    List<User> readAll();
+
+    User createUser(UserRequest userRequest);
 }

@@ -1,16 +1,20 @@
 package com.idf.idftestproject.repository.impl;
 
-import com.idf.idftestproject.model.Cryptocurrency;
+import com.idf.idftestproject.exception.RepositoryException;
 import com.idf.idftestproject.model.User;
 import com.idf.idftestproject.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.Optional;
+import java.util.List;
 
 @Repository
-public class UserRepositoryImpl extends AbstractRepository<User> implements UserRepository<User> {
+public class UserRepositoryImpl extends AbstractRepository<User> implements UserRepository {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected UserRepositoryImpl() {
         super(User.class);
@@ -22,16 +26,17 @@ public class UserRepositoryImpl extends AbstractRepository<User> implements User
     }
 
     @Override
-    public Optional<User> findByUserName(String userName) {
-        User user;
+    public User findByUserName(String userName) {
         try {
             final TypedQuery<User> query = entityManager.createQuery("select u from " +
                     User.class.getSimpleName() + " u where u.name=:userName", User.class);
-            user = query.setParameter("userName", userName)
+            User user = query.setParameter("userName", userName)
                     .getSingleResult();
-            return Optional.of(user);
+            return user;
         } catch (NoResultException e) {
-            return Optional.empty();
+            String message = "Could not find User with name" + userName;
+            logger.warn(message, e);
+            throw new RepositoryException(message, e);
         }
     }
 }

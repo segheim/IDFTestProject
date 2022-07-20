@@ -1,10 +1,12 @@
 package com.idf.idftestproject.web;
 
-import com.idf.idftestproject.dto.CurrencyDto;
 import com.idf.idftestproject.exception.ControllerException;
 import com.idf.idftestproject.model.Cryptocurrency;
 import com.idf.idftestproject.model.CryptocurrencyCode;
+import com.idf.idftestproject.repository.CryptocurrencyRepository;
 import com.idf.idftestproject.service.CryptocurrencyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,30 +14,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/currency")
 public class CurrencyController {
 
-    private final CryptocurrencyService service;
+    Logger logger = LoggerFactory.getLogger(CurrencyController.class);
+
+    @Autowired
+    private CryptocurrencyService cryptocurrencyService;
     @Autowired
     private List<CryptocurrencyCode> availableCryptocurrency;
 
     @Autowired
-    public CurrencyController(CryptocurrencyService service) {
-        this.service = service;
-    }
+    private CryptocurrencyRepository cryptocurrencyRepository;
+
 
     @GetMapping
-    public List<CryptocurrencyCode> readAll() throws ControllerException {
-        if (availableCryptocurrency.isEmpty()) {
-            throw new ControllerException("Cryptocurrency list is missing");
+    public List<String> readAll() throws ControllerException {
+        final List<String> cryptocurrenciesInfo = cryptocurrencyService.findAll();
+        if (cryptocurrenciesInfo.isEmpty()) {
+            String message = "Available cryptocurrencies are absent";
+            logger.warn(message);
+            throw new ControllerException(message);
         }
-        return availableCryptocurrency;
+
+//        cryptocurrencyRepository.createCryptocurrency(new Cryptocurrency(1l, "ETH", new BigDecimal(BigInteger.TEN)));
+//        cryptocurrencyService.retrieveCryptocurrencyPrice();
+
+        return cryptocurrencyService.findAll();
     }
 
     @GetMapping("/{symbol}")
-    public Cryptocurrency findPriceUsd(@PathVariable String symbol) throws Throwable {
-        return (Cryptocurrency) service.findCryptocurrencyBySymbol(symbol);
+    public Map<String, String> findPriceUsd(@PathVariable String symbol) {
+        return cryptocurrencyService.findPriceCryptocurrencyBySymbol(symbol);
     }
 }

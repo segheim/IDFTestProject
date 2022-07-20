@@ -1,10 +1,21 @@
 package com.idf.idftestproject.service;
 
+import com.idf.idftestproject.model.Cryptocurrency;
+import com.idf.idftestproject.model.User;
+import netscape.javascript.JSObject;
+
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
-public interface CryptocurrencyService<T>{
+public interface CryptocurrencyService {
 
-    List<T> findAll();
+    List<String> findAll();
 
-    T findCryptocurrencyBySymbol(String symbol) throws Throwable;
+    Map<String, String> findPriceCryptocurrencyBySymbol(String symbol);
+
+    List<Cryptocurrency> retrieveCryptocurrencyPrice();
+
+    Map<User, BigDecimal> calculateChangingCryptocurrency(List<Cryptocurrency> cryptocurrencies,
+                                                          List<User> users);
 }

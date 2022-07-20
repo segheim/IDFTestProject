@@ -1,31 +1,56 @@
 package com.idf.idftestproject.repository.impl;
 
+import com.idf.idftestproject.exception.RepositoryException;
 import com.idf.idftestproject.model.Cryptocurrency;
 import com.idf.idftestproject.repository.CryptocurrencyRepository;
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class CryptocurrencyRepositoryImpl extends AbstractRepository<Cryptocurrency> implements CryptocurrencyRepository<Cryptocurrency> {
+public class CryptocurrencyRepositoryImpl extends AbstractRepository<Cryptocurrency> implements CryptocurrencyRepository {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected CryptocurrencyRepositoryImpl() {
         super(Cryptocurrency.class);
     }
 
     @Override
-    public Optional<Cryptocurrency> findCryptocurrencyBySymbol(String symbol) {
-        Cryptocurrency cryptocurrency;
+    @Transactional
+    public void createCryptocurrency(Cryptocurrency cryptocurrency) {
+        final Session session = entityManager.unwrap(Session.class);
+        session.saveOrUpdate(cryptocurrency);
+        session.close();
+    }
+
+    @Override
+    @Transactional
+    public void createCryptocurrencies(List<Cryptocurrency> cryptocurrencies) {
+        final Session session = entityManager.unwrap(Session.class);
+        cryptocurrencies.forEach(cryptocurrency -> session.saveOrUpdate(cryptocurrency));
+        session.close();
+    }
+
+    @Override
+    public Cryptocurrency findCryptocurrencyBySymbol(String symbol) {
         try {
             final TypedQuery<Cryptocurrency> query = entityManager.createQuery("select u from " +
                     Cryptocurrency.class.getSimpleName() + " u where u.symbol=:symbol", Cryptocurrency.class);
-            cryptocurrency = query.setParameter("symbol", symbol)
+            Cryptocurrency cryptocurrency = query.setParameter("symbol", symbol)
                     .getSingleResult();
-            return Optional.of(cryptocurrency);
+            return cryptocurrency;
         } catch (NoResultException e) {
-            return Optional.empty();
+            String message = "Could not find cryptocurrency by symbol " + symbol;
+            logger.warn(message, e);
+            throw new RepositoryException(message, e);
         }
     }
 }

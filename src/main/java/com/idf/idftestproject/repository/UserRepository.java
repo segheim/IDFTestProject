@@ -2,11 +2,13 @@ package com.idf.idftestproject.repository;
 
 import com.idf.idftestproject.model.User;
 
-import java.util.Optional;
+import java.util.List;
 
-public interface UserRepository<T> {
+public interface UserRepository {
+
+    List<User> findAll();
 
     void createUser(User user);
 
-    Optional<T> findByUserName(String userName);
+    User findByUserName(String userName);
 }

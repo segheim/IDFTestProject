@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService<User> {
+public class UserServiceImpl implements UserService {
 
     private final CryptocurrencyRepository cryptocurrencyRepository;
     private final UserRepository userRepository;
@@ -25,23 +25,22 @@ public class UserServiceImpl implements UserService<User> {
         this.userRepository = userRepository;
     }
 
+    @Override
+    public List<User> readAll() {
+        return userRepository.findAll();
+    }
+
     @Transactional
     @Override
     public User createUser(UserRequest userRequest) {
-        final Optional cryptocurrencyBySymbol = cryptocurrencyRepository.findCryptocurrencyBySymbol(userRequest.getSymbol());
-        if (cryptocurrencyBySymbol.isEmpty()) {
-            throw new ServiceException("Could not find cryptocurrency " + userRequest.getSymbol());
-        }
-        final Cryptocurrency cryptocurrency = (Cryptocurrency) cryptocurrencyBySymbol.get();
+        final Cryptocurrency cryptocurrencyBySymbol = cryptocurrencyRepository.findCryptocurrencyBySymbol(userRequest.getSymbol());
         final User user = User.builder()
                 .name(userRequest.getUserName())
-                .price(cryptocurrency.getPriceUsd())
+                .symbol(userRequest.getSymbol())
+                .price(cryptocurrencyBySymbol.getPriceUsd())
                 .build();
         userRepository.createUser(user);
-        final Optional userFromBd = userRepository.findByUserName(userRequest.getUserName());
-        if (userFromBd.isEmpty()) {
-            throw new ServiceException("Could not finad user " + userRequest.getUserName());
-        }
-        return (User) userFromBd.get();
+        final User userFromBd = userRepository.findByUserName(userRequest.getUserName());
+        return userFromBd;
     }
 }
