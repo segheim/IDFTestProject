@@ -42,8 +42,6 @@ public class CurrencyConfiguration {
         final RetrieveCryptocurrencyPriceTask task = new RetrieveCryptocurrencyPriceTask();
         applicationContext.getAutowireCapableBeanFactory().autowireBean(task);
         task.setDaemon(true);
-        return (args) -> {
-            executor.execute(task);
-        };
+        return (args) -> executor.execute(task);
     }
 }

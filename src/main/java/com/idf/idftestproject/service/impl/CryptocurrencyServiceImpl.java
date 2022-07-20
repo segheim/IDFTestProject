@@ -6,11 +6,14 @@ import com.idf.idftestproject.model.User;
 import com.idf.idftestproject.repository.CoinLoreRepository;
 import com.idf.idftestproject.repository.CryptocurrencyRepository;
 import com.idf.idftestproject.service.CryptocurrencyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class CryptocurrencyServiceImpl implements CryptocurrencyService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private static final int MAX_PERCENT_FOR_PRICE_CHANGING = 1;
+    private static final int MAX_PERCENT = 100;
+    private static final int SCALE_OF_BIG_DECIMAL = 2;
 
     @Autowired
     private CryptocurrencyRepository cryptocurrencyRepository;
@@ -42,13 +51,14 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
     }
 
     @Override
-    @Transactional
     public List<Cryptocurrency> retrieveCryptocurrencyPrice() {
         final List<Long> ids = availableCryptocurrency.stream()
                 .map(cryptocurrencyCode -> cryptocurrencyCode.getId())
                 .collect(Collectors.toList());
         final List<Cryptocurrency> cryptocurrencies = coinloreRepository.getCoinLoreByAllId(ids);
-        cryptocurrencyRepository.createCryptocurrencies(cryptocurrencies);
+        if (!cryptocurrencies.isEmpty()) {
+            cryptocurrencyRepository.createCryptocurrencies(cryptocurrencies);
+        }
         return cryptocurrencies;
     }
 
@@ -63,7 +73,7 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
             if (cryptocurrencyOptional.isPresent()) {
                 final BigDecimal percentOfChangingPrice = calculatePercentOfChangingPrice(user.getPrice(),
                         cryptocurrencyOptional.get().getPriceUsd());
-                if (percentOfChangingPrice.compareTo(BigDecimal.ONE) == 1) {
+                if (percentOfChangingPrice.compareTo(BigDecimal.ONE) == MAX_PERCENT_FOR_PRICE_CHANGING) {
                     result.put(user, percentOfChangingPrice);
                 }
             }
@@ -73,6 +83,8 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
     }
 
     private BigDecimal calculatePercentOfChangingPrice(BigDecimal priceUser, BigDecimal priceActual) {
-        return priceUser.subtract(priceActual).abs().multiply(BigDecimal.valueOf(100)).divide(priceUser);
+        return priceUser.subtract(priceActual).abs()
+                .multiply(BigDecimal.valueOf(MAX_PERCENT))
+                .divide(priceUser, SCALE_OF_BIG_DECIMAL, RoundingMode.HALF_UP);
     }
 }

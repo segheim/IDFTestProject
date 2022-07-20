@@ -33,10 +33,12 @@ public class RetrieveCryptocurrencyPriceTask extends Thread {
             while (true) {
                 final List<Cryptocurrency> cryptocurrencies = cryptocurrencyService.retrieveCryptocurrencyPrice();
                 final List<User> users = userService.readAll();
-                final Map<User, BigDecimal> usersWithChangePrices = cryptocurrencyService.calculateChangingCryptocurrency(cryptocurrencies, users);
-                for (Map.Entry<User, BigDecimal> entry : usersWithChangePrices.entrySet()) {
-                    logger.warn("Changes! " + entry.getKey().getName() + " " + entry.getKey().getSymbol() + " " +
-                            entry.getValue().toString());
+                if (!cryptocurrencies.isEmpty() && cryptocurrencies != null && !users.isEmpty() || users != null) {
+                    final Map<User, BigDecimal> usersWithChangePrices = cryptocurrencyService.calculateChangingCryptocurrency(cryptocurrencies, users);
+                    for (Map.Entry<User, BigDecimal> entry : usersWithChangePrices.entrySet()) {
+                        logger.warn("Changes! " + entry.getKey().getName() + " " + entry.getKey().getSymbol() + " " +
+                                entry.getValue().toString());
+                    }
                 }
                 Thread.sleep(SURVEY_PERIOD);
             }

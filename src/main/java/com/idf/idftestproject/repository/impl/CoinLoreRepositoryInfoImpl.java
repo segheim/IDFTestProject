@@ -1,10 +1,12 @@
 package com.idf.idftestproject.repository.impl;
 
+import com.idf.idftestproject.exception.RepositoryException;
 import com.idf.idftestproject.model.Cryptocurrency;
 import com.idf.idftestproject.repository.CoinLoreRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -26,27 +28,21 @@ public class CoinLoreRepositoryInfoImpl implements CoinLoreRepository {
             return Collections.emptyList();
         }
         if (idList.size() > 1) {
-            RestTemplate restTemplate = new RestTemplate();
-            final String ids = idList.stream()
-                    .map(i -> i.toString())
-                    .collect(Collectors.joining(DELIMITER));
-            final String concat = BASIC_URL.concat(ids);
-            logger.info("IDIDIDIDIDIIDI" + concat);
-            final Cryptocurrency[] currencies = restTemplate.getForObject(concat, Cryptocurrency[].class);
-            logger.info("!!!!!!!!!!!!!" + Arrays.toString(currencies));
-            return Arrays.asList(currencies);
+            final Cryptocurrency[] currencies;
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                final String ids = idList.stream()
+                        .map(i -> i.toString())
+                        .collect(Collectors.joining(DELIMITER));
+                currencies = restTemplate.getForObject(BASIC_URL.concat(ids), Cryptocurrency[].class);
+                return Arrays.asList(currencies);
+            } catch (RestClientException e) {
+                String message = "CoinLore is not available now";
+                logger.warn(message, e);
+                return Collections.emptyList();
+            }
         }
         return List.of(getCoinLoreById(idList.stream().findFirst().get()));
-
-//        final Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(" https://api.coinlore.net/")
-//                .addConverterFactory(JacksonConverterFactory.create())
-//                .build();
-//        RetrofitService retrofitService = retrofit.create(RetrofitService.class);
-//        final Call<Currency> currencies = retrofitService.getUsers();
-//        logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + currencies.toString());
-//        return
-
     }
 
     @Override
