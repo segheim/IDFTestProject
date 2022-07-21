@@ -24,8 +24,7 @@ public class UserController {
     @PostMapping
     public User registration(@RequestBody UserRequest userRequest) throws ControllerException {
         try {
-            final User user = service.createUser(userRequest);
-            return user;
+            return service.createUser(userRequest);
         } catch (Exception e) {
             String message = "Could not create User with name " + userRequest.getUserName();
             logger.warn(message, e);

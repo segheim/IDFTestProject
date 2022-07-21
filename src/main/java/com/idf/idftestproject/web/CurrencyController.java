@@ -1,9 +1,6 @@
 package com.idf.idftestproject.web;
 
 import com.idf.idftestproject.exception.ControllerException;
-import com.idf.idftestproject.model.Cryptocurrency;
-import com.idf.idftestproject.model.CryptocurrencyCode;
-import com.idf.idftestproject.repository.CryptocurrencyRepository;
 import com.idf.idftestproject.service.CryptocurrencyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +24,13 @@ public class CurrencyController {
 
     @GetMapping
     public List<String> readAll() throws ControllerException {
-        final List<String> cryptocurrenciesInfo = cryptocurrencyService.findAll();
-        if (cryptocurrenciesInfo.isEmpty()) {
+        final List<String> cryptocurrenciesSymbols = cryptocurrencyService.findAllCryptocurrencySymbols();
+        if (cryptocurrenciesSymbols.isEmpty()) {
             String message = "Available cryptocurrencies are absent";
             logger.warn(message);
             throw new ControllerException(message);
         }
-        return cryptocurrencyService.findAll();
+        return cryptocurrenciesSymbols;
     }
 
     @GetMapping("/{symbol}")

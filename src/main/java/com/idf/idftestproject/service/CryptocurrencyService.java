@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface CryptocurrencyService {
 
-    List<String> findAll();
+    List<String> findAllCryptocurrencySymbols();
 
     Map<String, String> findPriceCryptocurrencyBySymbol(String symbol);
 

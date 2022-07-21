@@ -6,11 +6,8 @@ import com.idf.idftestproject.model.User;
 import com.idf.idftestproject.repository.CoinLoreRepository;
 import com.idf.idftestproject.repository.CryptocurrencyRepository;
 import com.idf.idftestproject.service.CryptocurrencyService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,9 +20,6 @@ import java.util.stream.Collectors;
 @Service
 public class CryptocurrencyServiceImpl implements CryptocurrencyService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private static final int MAX_PERCENT_FOR_PRICE_CHANGING = 1;
     private static final int MAX_PERCENT = 100;
     private static final int SCALE_OF_BIG_DECIMAL = 2;
 
@@ -37,9 +31,9 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
     private List<CryptocurrencyCode> availableCryptocurrency;
 
     @Override
-    public List<String> findAll() {
+    public List<String> findAllCryptocurrencySymbols() {
         return cryptocurrencyRepository.findAll().stream()
-                .map(cryptocurrency -> cryptocurrency.getSymbol())
+                .map(CryptocurrencyCode::getSymbol)
                 .collect(Collectors.toList());
     }
 
@@ -53,7 +47,7 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
     @Override
     public List<Cryptocurrency> retrieveCryptocurrencyPrice() {
         final List<Long> ids = availableCryptocurrency.stream()
-                .map(cryptocurrencyCode -> cryptocurrencyCode.getId())
+                .map(CryptocurrencyCode::getId)
                 .collect(Collectors.toList());
         final List<Cryptocurrency> cryptocurrencies = coinloreRepository.getCoinLoreByAllId(ids);
         if (!cryptocurrencies.isEmpty()) {
@@ -73,7 +67,7 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
             if (cryptocurrencyOptional.isPresent()) {
                 final BigDecimal percentOfChangingPrice = calculatePercentOfChangingPrice(user.getPrice(),
                         cryptocurrencyOptional.get().getPriceUsd());
-                if (percentOfChangingPrice.compareTo(BigDecimal.ONE) == MAX_PERCENT_FOR_PRICE_CHANGING) {
+                if (percentOfChangingPrice.compareTo(BigDecimal.ONE) > 0) {
                     result.put(user, percentOfChangingPrice);
                 }
             }

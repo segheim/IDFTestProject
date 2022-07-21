@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public List<User> readAll() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
@@ -35,7 +35,6 @@ public class UserServiceImpl implements UserService {
                 .price(cryptocurrencyBySymbol.getPriceUsd())
                 .build();
         userRepository.createUser(user);
-        final User userFromBd = userRepository.findByUserName(userRequest.getUserName());
-        return userFromBd;
+        return userRepository.findByUserName(userRequest.getUserName());
     }
 }

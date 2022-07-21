@@ -29,9 +29,8 @@ public class UserRepositoryImpl extends AbstractRepository<User> implements User
         try {
             final TypedQuery<User> query = entityManager.createQuery("select u from " +
                     User.class.getSimpleName() + " u where u.name=:userName", User.class);
-            User user = query.setParameter("userName", userName)
+            return query.setParameter("userName", userName)
                     .getSingleResult();
-            return user;
         } catch (NoResultException e) {
             String message = "Could not find User with name" + userName;
             logger.warn(message, e);

@@ -1,6 +1,5 @@
 package com.idf.idftestproject.repository.impl;
 
-import com.idf.idftestproject.exception.RepositoryException;
 import com.idf.idftestproject.model.Cryptocurrency;
 import com.idf.idftestproject.repository.CoinLoreRepository;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ public class CoinLoreRepositoryInfoImpl implements CoinLoreRepository {
             try {
                 RestTemplate restTemplate = new RestTemplate();
                 final String ids = idList.stream()
-                        .map(i -> i.toString())
+                        .map(Object::toString)
                         .collect(Collectors.joining(DELIMITER));
                 currencies = restTemplate.getForObject(BASIC_URL.concat(ids), Cryptocurrency[].class);
                 return Arrays.asList(currencies);

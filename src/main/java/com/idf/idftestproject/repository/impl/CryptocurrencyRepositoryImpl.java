@@ -34,7 +34,7 @@ public class CryptocurrencyRepositoryImpl extends AbstractRepository<Cryptocurre
     @Transactional
     public void createCryptocurrencies(List<Cryptocurrency> cryptocurrencies) {
         final Session session = entityManager.unwrap(Session.class);
-        cryptocurrencies.forEach(cryptocurrency -> session.saveOrUpdate(cryptocurrency));
+        cryptocurrencies.forEach(session::saveOrUpdate);
         session.close();
     }
 
@@ -43,9 +43,8 @@ public class CryptocurrencyRepositoryImpl extends AbstractRepository<Cryptocurre
         try {
             final TypedQuery<Cryptocurrency> query = entityManager.createQuery("select u from " +
                     Cryptocurrency.class.getSimpleName() + " u where u.symbol=:symbol", Cryptocurrency.class);
-            Cryptocurrency cryptocurrency = query.setParameter("symbol", symbol)
+            return query.setParameter("symbol", symbol)
                     .getSingleResult();
-            return cryptocurrency;
         } catch (NoResultException e) {
             String message = "Could not find cryptocurrency by symbol " + symbol;
             logger.warn(message, e);
